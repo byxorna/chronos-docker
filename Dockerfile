@@ -36,8 +36,8 @@ RUN mkdir /mesos && cd /mesos && curl -L "https://github.com/apache/mesos/archiv
 RUN mkdir /chronos && \
   cd /chronos && \
   curl -L "https://github.com/mesos/chronos/archive/${CHRONOS_VERSION}.tar.gz" | tar xzv --strip-components 1 && \
-  mvn clean -Dmaven.test.skip=true package
+  mvn clean -Dmaven.test.skip=true package && ln -s target/chronos*.jar target/chronos.jar
 EXPOSE 8080
-ENTRYPOINT java -cp /chronos/target/chronos*.jar org.apache.mesos.chronos.scheduler.Main
-#ENTRYPOINT ["java","-cp","/chronos/target/chronos*.jar","org.apache.mesos.chronos.scheduler.Main"]
+#ENTRYPOINT java -cp /chronos/target/chronos*.jar org.apache.mesos.chronos.scheduler.Main
+ENTRYPOINT ["java","-cp","/chronos/target/chronos.jar","org.apache.mesos.chronos.scheduler.Main"]
 CMD --master "${ZK_MASTER}" --zk_hosts "${ZK_HOSTS}" --hostname "${CHRONOS_HOSTNAME}"
