@@ -4,7 +4,7 @@ MAINTAINER Gabe Conradi <gummybearx@gmail.com>
 ENV CHRONOS_VERSION 2.3.4
 ENV MAVEN_VERSION 3.2.5
 ENV MESOS_VERSION 0.22.1
-ENV MESOS_NATIVE_LIBRARY /usr/lib/libmesos.so
+ENV MESOS_NATIVE_JAVA_LIBRARY /usr/lib/libmesos.so
 # this changes how the chronos UI redirects
 ENV CHRONOS_HOSTNAME chronos
 # override this to change where chronos looks to determine mesos master
@@ -31,12 +31,12 @@ RUN ln -s $(which nodejs) /usr/bin/node
 
 # first, lets set up mesos
 RUN mkdir /mesos && cd /mesos && curl -L "https://github.com/apache/mesos/archive/${MESOS_VERSION}.tar.gz" | tar xvz --strip-components 1 && \
-  ls -la && ./bootstrap && PATH=/build/bin:$PATH ./configure --disable-python && make && make install && rm -rf /mesos && find / |grep mesos
+  ls -la && ./bootstrap && PATH=/build/bin:$PATH ./configure --prefix=/usr --disable-python && make && make install && rm -rf /mesos && find / |grep libmesos
 
 RUN mkdir /chronos && \
   cd /chronos && \
   curl -L "https://github.com/mesos/chronos/archive/${CHRONOS_VERSION}.tar.gz" | tar xzv --strip-components 1 && \
-  mvn package
+  mvn clean -Dmaven.test.skip=true package
 EXPOSE 8080
 ENTRYPOINT java -cp /chronos/target/chronos*.jar org.apache.mesos.chronos.scheduler.Main
 #ENTRYPOINT ["java","-cp","/chronos/target/chronos*.jar","org.apache.mesos.chronos.scheduler.Main"]
