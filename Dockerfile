@@ -27,7 +27,7 @@ RUN apt-get update && \
   cd /chronos && \
   curl -L "https://github.com/mesos/chronos/archive/${CHRONOS_VERSION}.tar.gz" | tar xzv --strip-components 1 && \
   mvn clean -Dmaven.test.skip=true package && ln -s target/chronos*.jar target/chronos.jar && \
-  apt-remove -y --auto-remove build-essential autoconf libtool libsvn-dev libcurl4-nss-dev zlib1g-dev libsasl2-dev libapr1-dev maven nodejs npm
+  apt-get remove -y --auto-remove build-essential autoconf libtool libsvn-dev libcurl4-nss-dev zlib1g-dev libsasl2-dev libapr1-dev maven nodejs npm
 EXPOSE 8080
 #ENTRYPOINT java -cp /chronos/target/chronos*.jar org.apache.mesos.chronos.scheduler.Main
 ENTRYPOINT ["java","-cp","/chronos/target/chronos.jar","org.apache.mesos.chronos.scheduler.Main"]
