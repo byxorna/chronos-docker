@@ -1,10 +1,7 @@
-FROM debian:jessie
+FROM byxorna/mesos:0.22.1
 MAINTAINER Gabe Conradi <gummybearx@gmail.com>
 
 ENV CHRONOS_VERSION 2.3.4
-ENV MAVEN_VERSION 3.2.5
-ENV MESOS_VERSION 0.22.1
-ENV MESOS_NATIVE_JAVA_LIBRARY /usr/lib/libmesos.so
 # this changes how the chronos UI redirects
 ENV CHRONOS_HOSTNAME chronos
 # override this to change where chronos looks to determine mesos master
@@ -24,19 +21,13 @@ RUN apt-get update && \
     default-jdk \
     nodejs npm \
     maven && \
-  rm -rf /var/lib/apt/cache/lists/*
-
-# nodejs is installed as nodejs, so link node to nodejs
-RUN ln -s $(which nodejs) /usr/bin/node
-
-# first, lets set up mesos
-RUN mkdir /mesos && cd /mesos && curl -L "https://github.com/apache/mesos/archive/${MESOS_VERSION}.tar.gz" | tar xvz --strip-components 1 && \
-  ls -la && ./bootstrap && PATH=/build/bin:$PATH ./configure --prefix=/usr --disable-python && make && make install && rm -rf /mesos && find / |grep libmesos
-
-RUN mkdir /chronos && \
+  rm -rf /var/lib/apt/cache/lists/* && \
+  ln -s $(which nodejs) /usr/bin/node && \
+  mkdir /chronos && \
   cd /chronos && \
   curl -L "https://github.com/mesos/chronos/archive/${CHRONOS_VERSION}.tar.gz" | tar xzv --strip-components 1 && \
-  mvn clean -Dmaven.test.skip=true package && ln -s target/chronos*.jar target/chronos.jar
+  mvn clean -Dmaven.test.skip=true package && ln -s target/chronos*.jar target/chronos.jar && \
+  apt-remove -y --auto-remove build-essential autoconf libtool libsvn-dev libcurl4-nss-dev zlib1g-dev libsasl2-dev libapr1-dev maven nodejs npm
 EXPOSE 8080
 #ENTRYPOINT java -cp /chronos/target/chronos*.jar org.apache.mesos.chronos.scheduler.Main
 ENTRYPOINT ["java","-cp","/chronos/target/chronos.jar","org.apache.mesos.chronos.scheduler.Main"]
