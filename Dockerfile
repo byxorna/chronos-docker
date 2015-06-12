@@ -27,7 +27,4 @@ RUN apt-get update && \
   apt-get remove -y --auto-remove build-essential autoconf libtool maven nodejs npm
 EXPOSE 8080
 ENTRYPOINT ["sh","-c","java","-cp","/chronos/target/chronos.jar","org.apache.mesos.chronos.scheduler.Main"]
-CMD [ "--master","$ZK_MASTER",
-      "--zk_hosts","$ZK_HOSTS",
-      "--hostname","$CHRONOS_HOSTNAME",
-      "--zk_path","$ZK_STATE_PATH}" ]
+CMD [ "--master","$ZK_MASTER", "--zk_hosts","$ZK_HOSTS", "--hostname","$CHRONOS_HOSTNAME", "--zk_path","$ZK_STATE_PATH}" ]
