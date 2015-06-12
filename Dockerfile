@@ -5,9 +5,11 @@ ENV CHRONOS_VERSION 2.3.4
 # this changes how the chronos UI redirects
 ENV CHRONOS_HOSTNAME chronos
 # override this to change where chronos looks to determine mesos master
+# something like zk://zk1:2181,zk2:2181,zk3:2181/mesos/devel
 ENV ZK_MASTER zk://127.0.0.1:2181/mesos
-# override this with something like zk://zk1:2181,zk2:2181,zk3:2181/mesos/devel
+# zookeeper hosts to store state in. something like zk1:port,zk2:port,zk3:port
 ENV ZK_HOSTS  127.0.0.1:2181
+ENV ZK_STATE_PATH /chronos/state
 RUN apt-get update && \
   apt-get install -y curl \
     build-essential \
@@ -24,6 +26,5 @@ RUN apt-get update && \
   mvn clean -Dmaven.test.skip=true package && ln -s /chronos/target/chronos*.jar target/chronos.jar && \
   apt-get remove -y --auto-remove build-essential autoconf libtool maven nodejs npm
 EXPOSE 8080
-#ENTRYPOINT java -cp /chronos/target/chronos*.jar org.apache.mesos.chronos.scheduler.Main
-ENTRYPOINT ["java","-cp","/chronos/target/chronos.jar","org.apache.mesos.chronos.scheduler.Main"]
-CMD --master "${ZK_MASTER}" --zk_hosts "${ZK_HOSTS}" --hostname "${CHRONOS_HOSTNAME}"
+ENTRYPOINT java -cp /chronos/target/chronos.jar org.apache.mesos.chronos.scheduler.Main
+CMD --master "${ZK_MASTER}" --zk_hosts "${ZK_HOSTS}" --hostname "${CHRONOS_HOSTNAME}" --zk_path "${ZK_STATE_PATH}"
